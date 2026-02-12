@@ -134,17 +134,23 @@ button {
   text-transform: uppercase;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 .btn-legit {
   background: linear-gradient(135deg, #00ff88, #00cc66);
   color: #003322;
 }
 
-.btn-legit:hover {
+.btn-legit:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
 
-.btn-legit:active {
+.btn-legit:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -153,12 +159,12 @@ button {
   color: #fff;
 }
 
-.btn-phishing:hover {
+.btn-phishing:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
 }
 
-.btn-phishing:active {
+.btn-phishing:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -182,6 +188,105 @@ button {
 
 .feedback.wrong {
   color: #ff4444;
+}
+
+/* Explanation Panel Styles */
+.explanation-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: slideIn 0.4s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.explanation-panel.correct {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.explanation-panel.wrong {
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.explanation-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.explanation-icon {
+  font-size: 1.5em;
+}
+
+.explanation-title {
+  color: #00d4ff;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.explanation-list {
+  list-style: none;
+  padding: 0;
+}
+
+.explanation-list li {
+  padding: 10px 0;
+  padding-left: 30px;
+  position: relative;
+  font-size: 1.05em;
+  line-height: 1.5;
+  color: #e0e0e0;
+}
+
+.explanation-list li:before {
+  content: "•";
+  position: absolute;
+  left: 10px;
+  color: #00d4ff;
+  font-size: 1.5em;
+}
+
+.btn-next {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #00d4ff, #0099cc);
+  color: #fff;
+  padding: 12px 35px;
+  font-size: 1.1em;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-next:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+.btn-next:active {
+  transform: translateY(0);
 }
 
 .game-over {
@@ -268,6 +373,9 @@ button {
     </div>
 
     <div class="feedback" id="feedback"></div>
+
+    <!-- Explanation Panel (hidden by default) -->
+    <div id="explanationPanel" class="hidden"></div>
   </div>
 
   <div id="gameOverScreen" class="game-over hidden">
@@ -280,68 +388,129 @@ button {
 
 <script>
 // ============================================
-// EMAIL DATABASE
+// EMAIL DATABASE WITH EXPLANATIONS
 // ============================================
 const emails = [
   {
     subject: "Urgent! Verify your bank account",
     from: "support@secure-bank-login.com",
     body: "Dear customer, Your account has been temporarily suspended due to suspicious activity. Click here immediately to verify your identity and restore access. Failure to do so within 24 hours will result in permanent account closure.",
-    isPhishing: true
+    isPhishing: true,
+    explanation: [
+      "Suspicious domain 'secure-bank-login.com' - not an official bank domain",
+      "Creates urgency and fear to pressure you into acting quickly",
+      "Generic greeting 'Dear customer' instead of using your name",
+      "Threatens account closure to manipulate you"
+    ]
   },
   {
     subject: "Team Meeting Reminder - Tomorrow 10 AM",
     from: "hr@company.com",
     body: "Hi team, This is a reminder that we have our weekly team meeting scheduled for tomorrow at 10:00 AM in Conference Room B. Please review the agenda attached and come prepared with your project updates. See you there!",
-    isPhishing: false
+    isPhishing: false,
+    explanation: [
+      "Comes from legitimate company domain",
+      "Professional and friendly tone without urgency",
+      "No suspicious links or requests for sensitive information",
+      "Specific details like meeting time and location"
+    ]
   },
   {
     subject: "You've won $1,000,000!!!",
     from: "winner@lottery-claim-center.net",
     body: "CONGRATULATIONS! You have been randomly selected as the winner of our international lottery! To claim your prize of $1,000,000, please provide your bank account details, social security number, and a processing fee of $500. Act now before this offer expires!",
-    isPhishing: true
+    isPhishing: true,
+    explanation: [
+      "Too good to be true - unsolicited lottery winnings",
+      "Requests sensitive personal information (SSN, bank details)",
+      "Asks for money upfront to claim a 'prize'",
+      "Excessive use of caps and exclamation marks",
+      "Suspicious domain 'lottery-claim-center.net'"
+    ]
   },
   {
     subject: "Monthly Newsletter - April 2024",
     from: "newsletter@techcompany.com",
     body: "Welcome to our April newsletter! This month we're featuring new product updates, upcoming webinars, and industry insights. Check out our latest blog post about cybersecurity best practices. You can unsubscribe anytime from your account settings.",
-    isPhishing: false
+    isPhishing: false,
+    explanation: [
+      "Legitimate company newsletter from official domain",
+      "No urgent calls to action or threats",
+      "Provides unsubscribe option (required by law)",
+      "Informational content without requesting personal data"
+    ]
   },
   {
     subject: "ACTION REQUIRED: Update Payment Information",
     from: "billing@paypa1-secure.com",
     body: "We noticed an issue with your payment method. Your PayPal account will be limited unless you update your information immediately. Click the link below to verify your credit card details and avoid service interruption.",
-    isPhishing: true
+    isPhishing: true,
+    explanation: [
+      "Domain uses number '1' instead of letter 'l' in PayPal - classic phishing trick",
+      "Creates false urgency about account limitation",
+      "Requests sensitive payment information",
+      "Real PayPal would never ask for this via email"
+    ]
   },
   {
     subject: "Invoice #45821 - Payment Confirmation",
     from: "accounts@vendor.com",
     body: "Thank you for your recent purchase. Your payment of $299.00 has been processed successfully. Please find attached your invoice for order #45821. If you have any questions, contact our support team at support@vendor.com.",
-    isPhishing: false
+    isPhishing: false,
+    explanation: [
+      "Professional business communication",
+      "Provides specific order and invoice numbers",
+      "Legitimate support contact information",
+      "No urgent demands or suspicious requests"
+    ]
   },
   {
     subject: "Your package could not be delivered",
     from: "delivery@fedx-express.com",
     body: "We attempted to deliver your package but no one was available. To reschedule delivery, please confirm your address and pay a $3.99 redelivery fee by clicking the link below. Your package will be returned if not claimed within 48 hours.",
-    isPhishing: true
+    isPhishing: true,
+    explanation: [
+      "Misspelled domain 'fedx' instead of 'fedex'",
+      "Unexpected delivery fee for a package you didn't order",
+      "Creates urgency with 48-hour deadline",
+      "Legitimate carriers don't ask for payment via email links"
+    ]
   },
   {
     subject: "Weekly Report - Q1 Results",
     from: "analytics@company.com",
     body: "Hello, Please find attached the weekly analytics report for Q1. Our team has seen a 15% increase in user engagement this quarter. The detailed breakdown is available in the attached PDF. Let me know if you need any clarification.",
-    isPhishing: false
+    isPhishing: false,
+    explanation: [
+      "Internal company communication from verified domain",
+      "Professional business language",
+      "Specific data and metrics included",
+      "No suspicious links or requests for personal information"
+    ]
   },
   {
     subject: "Security Alert: New login from unknown device",
     from: "no-reply@app1e-security.com",
     body: "We detected a login to your Apple ID from a device we don't recognize. If this wasn't you, your account may be compromised. Click here to secure your account immediately and change your password. Location: Russia. Device: Windows PC.",
-    isPhishing: true
+    isPhishing: true,
+    explanation: [
+      "Domain uses number '1' instead of letter 'l' in Apple",
+      "Fake security alert to create panic",
+      "Suspicious login location designed to scare you",
+      "Real Apple security alerts come through official app notifications"
+    ]
   },
   {
     subject: "Your subscription renewal confirmation",
     from: "subscriptions@streamingservice.com",
     body: "Hi there! Your monthly subscription has been successfully renewed for $12.99. Your next billing date is May 15, 2024. You can manage your subscription settings anytime from your account dashboard. Thanks for being a valued member!",
-    isPhishing: false
+    isPhishing: false,
+    explanation: [
+      "Legitimate subscription confirmation",
+      "Specific pricing and billing date information",
+      "No requests for payment or personal information",
+      "Directs to account dashboard for changes (not external link)"
+    ]
   }
 ];
 
@@ -374,6 +543,7 @@ const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScore = document.getElementById('finalScore');
 const rankMessage = document.getElementById('rankMessage');
 const btnRestart = document.getElementById('btnRestart');
+const explanationPanel = document.getElementById('explanationPanel');
 
 // ============================================
 // GAME FUNCTIONS
@@ -407,7 +577,14 @@ function showEmail() {
   }
 
   buttonsEnabled = true;
+  btnLegit.disabled = false;
+  btnPhishing.disabled = false;
+  
   const email = shuffledEmails[currentEmailIndex];
+  
+  // Hide explanation panel
+  explanationPanel.classList.add('hidden');
+  explanationPanel.innerHTML = '';
   
   // Fade in animation
   emailCard.classList.add('fade-out');
@@ -455,16 +632,58 @@ function startTimer() {
   }, 1000);
 }
 
+// Show explanation panel
+function showExplanation(isCorrect) {
+  const email = shuffledEmails[currentEmailIndex];
+  
+  // Create explanation HTML
+  const icon = isCorrect ? '✅' : '❌';
+  const resultClass = isCorrect ? 'correct' : 'wrong';
+  
+  let explanationHTML = `
+    <div class="explanation-panel ${resultClass}">
+      <div class="explanation-header">
+        <span class="explanation-icon">${icon}</span>
+        <span>${isCorrect ? 'Correct!' : 'Wrong!'}</span>
+      </div>
+      <div class="explanation-title">Why?</div>
+      <ul class="explanation-list">
+  `;
+  
+  email.explanation.forEach(reason => {
+    explanationHTML += `<li>${reason}</li>`;
+  });
+  
+  explanationHTML += `
+      </ul>
+      <button class="btn-next" id="btnNext">Next Email →</button>
+    </div>
+  `;
+  
+  explanationPanel.innerHTML = explanationHTML;
+  explanationPanel.classList.remove('hidden');
+  
+  // Add event listener to Next button
+  document.getElementById('btnNext').addEventListener('click', () => {
+    currentEmailIndex++;
+    showEmail();
+  });
+}
+
 // Handle answer selection
 function handleAnswer(userSaidPhishing) {
   if (!buttonsEnabled) return;
   
+  // Disable buttons and stop timer
   buttonsEnabled = false;
+  btnLegit.disabled = true;
+  btnPhishing.disabled = true;
   clearInterval(timerInterval);
   
   const email = shuffledEmails[currentEmailIndex];
   const isCorrect = userSaidPhishing === email.isPhishing;
   
+  // Update score first
   if (isCorrect) {
     currentScore += 10;
     feedback.textContent = "Correct! 🎉";
@@ -477,26 +696,31 @@ function handleAnswer(userSaidPhishing) {
   
   updateScore();
   
+  // Show explanation panel after brief delay
   setTimeout(() => {
-    currentEmailIndex++;
-    showEmail();
-  }, 1500);
+    showExplanation(isCorrect);
+  }, 800);
 }
 
 // Handle timeout
 function handleTimeout() {
   if (!buttonsEnabled) return;
   
+  // Disable buttons
   buttonsEnabled = false;
+  btnLegit.disabled = true;
+  btnPhishing.disabled = true;
+  
+  // Update score
   currentScore -= 5;
   feedback.textContent = "Time's up! ⏰";
   feedback.className = 'feedback wrong';
   updateScore();
   
+  // Show explanation as wrong answer
   setTimeout(() => {
-    currentEmailIndex++;
-    showEmail();
-  }, 1500);
+    showExplanation(false);
+  }, 800);
 }
 
 // End game and show results
