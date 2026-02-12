@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Detection Game</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  padding: 20px;
+}
+
+.container {
+  max-width: 700px;
+  width: 100%;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 10px rgba(0, 255, 255, 0.5);
+}
+
+.subtitle {
+  font-size: 1.1em;
+  color: #00d4ff;
+  opacity: 0.9;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.score, .timer, .progress {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.score span, .timer span, .progress span {
+  color: #00ff88;
+}
+
+.timer.warning span {
+  color: #ff4444;
+  animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.email-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+.email-header {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.email-subject {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #00d4ff;
+}
+
+.email-from {
+  font-size: 1em;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.email-from span {
+  color: #fff;
+  font-weight: bold;
+}
+
+.email-body {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: #e0e0e0;
+  margin-top: 15px;
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+}
+
+.btn-legit {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: #003322;
+}
+
+.btn-legit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+}
+
+.btn-legit:active {
+  transform: translateY(0);
+}
+
+.btn-phishing {
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  color: #fff;
+}
+
+.btn-phishing:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+}
+
+.btn-phishing:active {
+  transform: translateY(0);
+}
+
+.feedback {
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-top: 15px;
+  min-height: 30px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.feedback.correct {
+  color: #00ff88;
+}
+
+.feedback.wrong {
+  color: #ff4444;
+}
+
+.game-over {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-over h2 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #00d4ff;
+}
+
+.final-score {
+  font-size: 2em;
+  margin: 20px 0;
+  color: #00ff88;
+}
+
+.rank-message {
+  font-size: 1.5em;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.btn-restart {
+  margin-top: 30px;
+  background: linear-gradient(135deg, #00d4ff, #0099cc);
+  color: #fff;
+  padding: 15px 50px;
+  font-size: 1.2em;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-restart:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+.hidden {
+  display: none;
+}
+
+.fade-out {
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔒 Phishing Detection Game</h1>
+    <p class="subtitle">Can you spot the phishing emails?</p>
+  </header>
+
+  <div id="gameScreen">
+    <div class="game-info">
+      <div class="score">Score: <span id="scoreValue">0</span></div>
+      <div class="progress">Email: <span id="emailProgress">1/10</span></div>
+      <div class="timer" id="timer">Time: <span id="timeValue">15</span>s</div>
+    </div>
+
+    <div class="email-card" id="emailCard">
+      <div class="email-header">
+        <div class="email-subject" id="emailSubject"></div>
+        <div class="email-from">From: <span id="emailFrom"></span></div>
+      </div>
+      <div class="email-body" id="emailBody"></div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn-legit" id="btnLegit">✅ Legit</button>
+      <button class="btn-phishing" id="btnPhishing">❌ Phishing</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div id="gameOverScreen" class="game-over hidden">
+    <h2>🎯 Game Over!</h2>
+    <div class="final-score">Final Score: <span id="finalScore">0</span></div>
+    <div class="rank-message" id="rankMessage"></div>
+    <button class="btn-restart" id="btnRestart">🔄 Restart Game</button>
+  </div>
+</div>
+
+<script>
+// ============================================
+// EMAIL DATABASE
+// ============================================
+const emails = [
+  {
+    subject: "Urgent! Verify your bank account",
+    from: "support@secure-bank-login.com",
+    body: "Dear customer, Your account has been temporarily suspended due to suspicious activity. Click here immediately to verify your identity and restore access. Failure to do so within 24 hours will result in permanent account closure.",
+    isPhishing: true
+  },
+  {
+    subject: "Team Meeting Reminder - Tomorrow 10 AM",
+    from: "hr@company.com",
+    body: "Hi team, This is a reminder that we have our weekly team meeting scheduled for tomorrow at 10:00 AM in Conference Room B. Please review the agenda attached and come prepared with your project updates. See you there!",
+    isPhishing: false
+  },
+  {
+    subject: "You've won $1,000,000!!!",
+    from: "winner@lottery-claim-center.net",
+    body: "CONGRATULATIONS! You have been randomly selected as the winner of our international lottery! To claim your prize of $1,000,000, please provide your bank account details, social security number, and a processing fee of $500. Act now before this offer expires!",
+    isPhishing: true
+  },
+  {
+    subject: "Monthly Newsletter - April 2024",
+    from: "newsletter@techcompany.com",
+    body: "Welcome to our April newsletter! This month we're featuring new product updates, upcoming webinars, and industry insights. Check out our latest blog post about cybersecurity best practices. You can unsubscribe anytime from your account settings.",
+    isPhishing: false
+  },
+  {
+    subject: "ACTION REQUIRED: Update Payment Information",
+    from: "billing@paypa1-secure.com",
+    body: "We noticed an issue with your payment method. Your PayPal account will be limited unless you update your information immediately. Click the link below to verify your credit card details and avoid service interruption.",
+    isPhishing: true
+  },
+  {
+    subject: "Invoice #45821 - Payment Confirmation",
+    from: "accounts@vendor.com",
+    body: "Thank you for your recent purchase. Your payment of $299.00 has been processed successfully. Please find attached your invoice for order #45821. If you have any questions, contact our support team at support@vendor.com.",
+    isPhishing: false
+  },
+  {
+    subject: "Your package could not be delivered",
+    from: "delivery@fedx-express.com",
+    body: "We attempted to deliver your package but no one was available. To reschedule delivery, please confirm your address and pay a $3.99 redelivery fee by clicking the link below. Your package will be returned if not claimed within 48 hours.",
+    isPhishing: true
+  },
+  {
+    subject: "Weekly Report - Q1 Results",
+    from: "analytics@company.com",
+    body: "Hello, Please find attached the weekly analytics report for Q1. Our team has seen a 15% increase in user engagement this quarter. The detailed breakdown is available in the attached PDF. Let me know if you need any clarification.",
+    isPhishing: false
+  },
+  {
+    subject: "Security Alert: New login from unknown device",
+    from: "no-reply@app1e-security.com",
+    body: "We detected a login to your Apple ID from a device we don't recognize. If this wasn't you, your account may be compromised. Click here to secure your account immediately and change your password. Location: Russia. Device: Windows PC.",
+    isPhishing: true
+  },
+  {
+    subject: "Your subscription renewal confirmation",
+    from: "subscriptions@streamingservice.com",
+    body: "Hi there! Your monthly subscription has been successfully renewed for $12.99. Your next billing date is May 15, 2024. You can manage your subscription settings anytime from your account dashboard. Thanks for being a valued member!",
+    isPhishing: false
+  }
+];
+
+// ============================================
+// GAME STATE
+// ============================================
+let currentScore = 0;
+let currentEmailIndex = 0;
+let shuffledEmails = [];
+let timeLeft = 15;
+let timerInterval;
+let buttonsEnabled = true;
+
+// ============================================
+// DOM ELEMENTS
+// ============================================
+const scoreValue = document.getElementById('scoreValue');
+const emailProgress = document.getElementById('emailProgress');
+const timeValue = document.getElementById('timeValue');
+const timerElement = document.getElementById('timer');
+const emailSubject = document.getElementById('emailSubject');
+const emailFrom = document.getElementById('emailFrom');
+const emailBody = document.getElementById('emailBody');
+const emailCard = document.getElementById('emailCard');
+const feedback = document.getElementById('feedback');
+const btnLegit = document.getElementById('btnLegit');
+const btnPhishing = document.getElementById('btnPhishing');
+const gameScreen = document.getElementById('gameScreen');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const finalScore = document.getElementById('finalScore');
+const rankMessage = document.getElementById('rankMessage');
+const btnRestart = document.getElementById('btnRestart');
+
+// ============================================
+// GAME FUNCTIONS
+// ============================================
+
+// Shuffle emails array
+function shuffleEmails() {
+  shuffledEmails = [...emails];
+  for (let i = shuffledEmails.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledEmails[i], shuffledEmails[j]] = [shuffledEmails[j], shuffledEmails[i]];
+  }
+}
+
+// Initialize game
+function initGame() {
+  currentScore = 0;
+  currentEmailIndex = 0;
+  shuffleEmails();
+  updateScore();
+  showEmail();
+  gameScreen.classList.remove('hidden');
+  gameOverScreen.classList.add('hidden');
+}
+
+// Display current email
+function showEmail() {
+  if (currentEmailIndex >= shuffledEmails.length) {
+    endGame();
+    return;
+  }
+
+  buttonsEnabled = true;
+  const email = shuffledEmails[currentEmailIndex];
+  
+  // Fade in animation
+  emailCard.classList.add('fade-out');
+  setTimeout(() => {
+    emailSubject.textContent = email.subject;
+    emailFrom.textContent = email.from;
+    emailBody.textContent = email.body;
+    emailCard.classList.remove('fade-out');
+  }, 150);
+
+  feedback.textContent = '';
+  updateProgress();
+  startTimer();
+}
+
+// Update score display
+function updateScore() {
+  scoreValue.textContent = currentScore;
+}
+
+// Update progress display
+function updateProgress() {
+  emailProgress.textContent = `${currentEmailIndex + 1}/${shuffledEmails.length}`;
+}
+
+// Start countdown timer
+function startTimer() {
+  timeLeft = 15;
+  timeValue.textContent = timeLeft;
+  timerElement.classList.remove('warning');
+  
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timeValue.textContent = timeLeft;
+    
+    if (timeLeft <= 5) {
+      timerElement.classList.add('warning');
+    }
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+// Handle answer selection
+function handleAnswer(userSaidPhishing) {
+  if (!buttonsEnabled) return;
+  
+  buttonsEnabled = false;
+  clearInterval(timerInterval);
+  
+  const email = shuffledEmails[currentEmailIndex];
+  const isCorrect = userSaidPhishing === email.isPhishing;
+  
+  if (isCorrect) {
+    currentScore += 10;
+    feedback.textContent = "Correct! 🎉";
+    feedback.className = 'feedback correct';
+  } else {
+    currentScore -= 5;
+    feedback.textContent = "Wrong! ⚠️";
+    feedback.className = 'feedback wrong';
+  }
+  
+  updateScore();
+  
+  setTimeout(() => {
+    currentEmailIndex++;
+    showEmail();
+  }, 1500);
+}
+
+// Handle timeout
+function handleTimeout() {
+  if (!buttonsEnabled) return;
+  
+  buttonsEnabled = false;
+  currentScore -= 5;
+  feedback.textContent = "Time's up! ⏰";
+  feedback.className = 'feedback wrong';
+  updateScore();
+  
+  setTimeout(() => {
+    currentEmailIndex++;
+    showEmail();
+  }, 1500);
+}
+
+// End game and show results
+function endGame() {
+  clearInterval(timerInterval);
+  gameScreen.classList.add('hidden');
+  gameOverScreen.classList.remove('hidden');
+  
+  finalScore.textContent = currentScore;
+  
+  if (currentScore > 70) {
+    rankMessage.textContent = "🛡️ Security Expert!";
+    rankMessage.style.color = "#00ff88";
+  } else {
+    rankMessage.textContent = "🔐 Needs Training";
+    rankMessage.style.color = "#ff4444";
+  }
+}
+
+// Restart game
+function restartGame() {
+  initGame();
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+btnLegit.addEventListener('click', () => handleAnswer(false));
+btnPhishing.addEventListener('click', () => handleAnswer(true));
+btnRestart.addEventListener('click', restartGame);
+
+// ============================================
+// START GAME
+// ============================================
+initGame();
+</script>
+</body>
+</html>
