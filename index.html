@@ -3,8 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phishing Detection Game</title>
+<title>Phishing Detection Game v2.0</title>
 <style>
+/* ============================================
+   CSS VARIABLES FOR THEMING
+   ============================================ */
+:root {
+  --bg-primary: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --bg-card: rgba(255, 255, 255, 0.15);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #aaaaaa;
+  --accent-primary: #00d4ff;
+  --accent-success: #00ff88;
+  --accent-danger: #ff4444;
+  --accent-warning: #ffa500;
+  --accent-gold: #FFD700;
+  --border-color: rgba(255, 255, 255, 0.2);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode {
+  --bg-primary: linear-gradient(135deg, #000000, #1a1a1a, #0a0a0a);
+  --bg-card: rgba(40, 40, 40, 0.95);
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 * {
   margin: 0;
   padding: 0;
@@ -13,23 +44,28 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background: var(--bg-primary);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #fff;
+  color: var(--text-primary);
   padding: 20px;
+  transition: background 0.3s ease;
 }
 
 .container {
-  max-width: 700px;
+  max-width: 800px;
   width: 100%;
 }
 
+/* ============================================
+   HEADER
+   ============================================ */
 header {
   text-align: center;
   margin-bottom: 30px;
+  position: relative;
 }
 
 h1 {
@@ -40,169 +76,160 @@ h1 {
 
 .subtitle {
   font-size: 1.1em;
-  color: #00d4ff;
+  color: var(--accent-primary);
   opacity: 0.9;
 }
 
-/* High Score Display */
-.high-score-display {
-  text-align: center;
-  background: rgba(255, 215, 0, 0.1);
-  border: 2px solid rgba(255, 215, 0, 0.3);
-  padding: 12px 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+#darkModeToggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: all 0.3s ease;
   backdrop-filter: blur(10px);
 }
 
-.high-score-display span {
-  color: #FFD700;
-  font-weight: bold;
-  font-size: 1.2em;
+#darkModeToggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
-/* Start Screen */
-.start-screen {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.15);
+/* ============================================
+   SCREENS
+   ============================================ */
+.screen {
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 50px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
   animation: fadeIn 0.5s ease;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+.hidden { display: none; }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--bg-overlay);
+  text-transform: uppercase;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #0099cc);
+  color: #fff;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--accent-success), #00cc66);
+  color: #003322;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--accent-danger), #cc0000);
+  color: #fff;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--accent-warning), #ff8800);
+  color: #fff;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--accent-gold), #FFA500);
+  color: #000;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+/* ============================================
+   START SCREEN
+   ============================================ */
 .start-screen h2 {
   font-size: 2.2em;
-  margin-bottom: 15px;
-  color: #00d4ff;
-}
-
-.start-screen p {
-  font-size: 1.2em;
-  margin-bottom: 35px;
-  color: #e0e0e0;
+  margin-bottom: 20px;
+  color: var(--accent-primary);
 }
 
 .difficulty-buttons {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  margin-bottom: 20px;
-}
-
-.btn-difficulty {
-  padding: 18px 40px;
-  font-size: 1.3em;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-transform: uppercase;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-difficulty:before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.5s, height 0.5s;
-}
-
-.btn-difficulty:hover:before {
-  width: 300px;
-  height: 300px;
-}
-
-.btn-difficulty span {
-  position: relative;
-  z-index: 1;
-}
-
-.btn-easy {
-  background: linear-gradient(135deg, #00ff88, #00cc66);
-  color: #003322;
-}
-
-.btn-easy:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
-}
-
-.btn-medium {
-  background: linear-gradient(135deg, #ffa500, #ff8800);
-  color: #fff;
-}
-
-.btn-medium:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
-}
-
-.btn-hard {
-  background: linear-gradient(135deg, #ff4444, #cc0000);
-  color: #fff;
-}
-
-.btn-hard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+  margin: 30px 0;
 }
 
 .difficulty-info {
   font-size: 0.9em;
-  color: #aaa;
-  margin-top: 10px;
+  color: var(--text-muted);
+  margin-top: 5px;
 }
 
+.menu-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.menu-buttons button {
+  flex: 1;
+  padding: 12px 20px;
+  font-size: 1em;
+}
+
+/* ============================================
+   GAME SCREEN
+   ============================================ */
 .game-info {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
   padding: 15px 20px;
   border-radius: 10px;
   backdrop-filter: blur(10px);
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
-.score, .timer, .progress, .difficulty-label {
-  font-size: 1.2em;
+.game-info > div {
+  font-size: 1.1em;
   font-weight: bold;
 }
 
-.score span, .timer span, .progress span {
-  color: #00ff88;
-}
-
-.difficulty-label span {
-  color: #00d4ff;
+.game-info span {
+  color: var(--accent-success);
 }
 
 .timer.warning span {
-  color: #ff4444;
+  color: var(--accent-danger);
   animation: pulse 0.5s infinite;
 }
 
@@ -212,18 +239,17 @@ h1 {
 }
 
 .email-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-radius: 15px;
   padding: 30px;
   margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: opacity 0.3s ease;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
 }
 
 .email-header {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 15px;
   margin-bottom: 15px;
 }
@@ -232,25 +258,73 @@ h1 {
   font-size: 1.4em;
   font-weight: bold;
   margin-bottom: 10px;
-  color: #00d4ff;
+  color: var(--accent-primary);
 }
 
 .email-from {
   font-size: 1em;
-  color: #aaa;
-  margin-bottom: 5px;
+  color: var(--text-muted);
 }
 
 .email-from span {
-  color: #fff;
+  color: var(--text-primary);
   font-weight: bold;
 }
 
 .email-body {
   font-size: 1.1em;
   line-height: 1.6;
-  color: #e0e0e0;
+  color: var(--text-secondary);
   margin-top: 15px;
+}
+
+/* Fake link styling */
+.email-link {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  position: relative;
+}
+
+.email-link.suspicious {
+  color: var(--accent-danger);
+  text-decoration: underline wavy;
+  font-weight: bold;
+}
+
+.link-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: rgba(0, 0, 0, 0.95);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+  display: none;
+}
+
+.link-tooltip.show {
+  display: block;
+  animation: tooltipFade 0.3s ease;
+}
+
+@keyframes tooltipFade {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.link-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  border: 8px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
 }
 
 .buttons {
@@ -260,99 +334,43 @@ h1 {
   margin-top: 30px;
 }
 
-button {
-  padding: 15px 40px;
-  font-size: 1.2em;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-transform: uppercase;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-legit {
-  background: linear-gradient(135deg, #00ff88, #00cc66);
-  color: #003322;
-}
-
-.btn-legit:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
-}
-
-.btn-legit:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-phishing {
-  background: linear-gradient(135deg, #ff4444, #cc0000);
-  color: #fff;
-}
-
-.btn-phishing:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
-}
-
-.btn-phishing:active:not(:disabled) {
-  transform: translateY(0);
-}
-
 .feedback {
   text-align: center;
   font-size: 1.3em;
   font-weight: bold;
   margin-top: 15px;
   min-height: 30px;
-  animation: fadeIn 0.3s ease;
 }
 
-.feedback.correct {
-  color: #00ff88;
-}
+.feedback.correct { color: var(--accent-success); }
+.feedback.wrong { color: var(--accent-danger); }
 
-.feedback.wrong {
-  color: #ff4444;
-}
-
-/* Explanation Panel */
+/* ============================================
+   EXPLANATION PANEL
+   ============================================ */
 .explanation-panel {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
   backdrop-filter: blur(15px);
   border-radius: 12px;
   padding: 25px;
   margin-top: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--border-color);
   animation: slideIn 0.4s ease;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px var(--bg-overlay);
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .explanation-panel.correct {
-  border-color: #00ff88;
+  border-color: var(--accent-success);
   background: rgba(0, 255, 136, 0.1);
 }
 
 .explanation-panel.wrong {
-  border-color: #ff4444;
+  border-color: var(--accent-danger);
   background: rgba(255, 68, 68, 0.1);
 }
 
@@ -365,12 +383,8 @@ button:disabled {
   font-weight: bold;
 }
 
-.explanation-icon {
-  font-size: 1.5em;
-}
-
 .explanation-title {
-  color: #00d4ff;
+  color: var(--accent-primary);
   font-size: 1.2em;
   margin-bottom: 15px;
   font-weight: bold;
@@ -387,104 +401,109 @@ button:disabled {
   position: relative;
   font-size: 1.05em;
   line-height: 1.5;
-  color: #e0e0e0;
+  color: var(--text-secondary);
 }
 
 .explanation-list li:before {
   content: "•";
   position: absolute;
   left: 10px;
-  color: #00d4ff;
+  color: var(--accent-primary);
   font-size: 1.5em;
 }
 
-.btn-next {
-  margin-top: 20px;
-  background: linear-gradient(135deg, #00d4ff, #0099cc);
-  color: #fff;
-  padding: 12px 35px;
+/* ============================================
+   LEADERBOARD
+   ============================================ */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-table th {
+  background: var(--bg-card);
+  color: var(--accent-primary);
+  font-weight: bold;
   font-size: 1.1em;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-.btn-next:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+.leaderboard-table tr:hover {
+  background: rgba(0, 212, 255, 0.1);
 }
 
-.btn-next:active {
-  transform: translateY(0);
+.rank-medal {
+  font-size: 1.5em;
+  margin-right: 10px;
 }
 
-/* Game Over Screen */
-.game-over {
+/* ============================================
+   ANALYTICS
+   ============================================ */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
   text-align: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 15px;
-  padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: fadeIn 0.5s ease;
 }
 
+.stat-value {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: var(--accent-success);
+  margin: 10px 0;
+}
+
+.stat-label {
+  font-size: 1.1em;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   GAME OVER
+   ============================================ */
 .game-over h2 {
   font-size: 2.5em;
   margin-bottom: 20px;
-  color: #00d4ff;
+  color: var(--accent-primary);
 }
 
 .final-score {
   font-size: 2em;
   margin: 20px 0;
-  color: #00ff88;
+  color: var(--accent-success);
 }
 
 .rank-message {
   font-size: 1.5em;
   margin: 20px 0;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
   border-radius: 10px;
-}
-
-.new-high-score {
-  background: rgba(255, 215, 0, 0.2);
-  border: 2px solid #FFD700;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 20px 0;
-  animation: glow 1s ease-in-out infinite;
-}
-
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-  }
-}
-
-.new-high-score h3 {
-  color: #FFD700;
-  font-size: 1.8em;
-  margin-bottom: 15px;
 }
 
 .name-input {
   padding: 12px 20px;
   font-size: 1.1em;
-  border: 2px solid #00d4ff;
+  border: 2px solid var(--accent-primary);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-card);
+  color: var(--text-primary);
   text-align: center;
   width: 80%;
   max-width: 300px;
@@ -492,103 +511,80 @@ button:disabled {
 }
 
 .name-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
 }
 
-.btn-save-score {
-  margin-top: 15px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #000;
-  padding: 12px 30px;
-  font-size: 1.1em;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
-  font-weight: bold;
+.difficulty-badge {
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  margin-top: 10px;
 }
 
-.btn-save-score:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-}
+.badge-easy { background: var(--accent-success); color: #000; }
+.badge-medium { background: var(--accent-warning); color: #000; }
+.badge-hard { background: var(--accent-danger); color: #fff; }
 
-.btn-restart {
-  margin-top: 30px;
-  background: linear-gradient(135deg, #00d4ff, #0099cc);
-  color: #fff;
-  padding: 15px 50px;
-  font-size: 1.2em;
-  border-radius: 10px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.btn-restart:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
-}
-
-.hidden {
-  display: none;
-}
-
-.fade-out {
-  opacity: 0;
-}
-
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 @media (max-width: 600px) {
-  h1 {
-    font-size: 2em;
+  h1 { font-size: 2em; }
+  .screen { padding: 20px; }
+  .buttons { flex-direction: column; }
+  button { width: 100%; }
+  #darkModeToggle {
+    position: static;
+    margin: 10px auto;
+    display: block;
   }
-  
-  .game-info {
-    font-size: 0.9em;
-  }
-  
-  .buttons {
+  .menu-buttons {
     flex-direction: column;
   }
 }
 </style>
 </head>
 <body>
+
 <div class="container">
+  <!-- Header -->
   <header>
-    <h1>🔒 Phishing Detection Game</h1>
-    <p class="subtitle">Can you spot the phishing emails?</p>
+    <h1>🔒 Phishing Detection Game v2.0</h1>
+    <p class="subtitle">Master the art of spotting phishing emails</p>
+    <button id="darkModeToggle">🌙 Dark Mode</button>
   </header>
 
-  <!-- High Score Display -->
-  <div id="highScoreDisplay" class="high-score-display hidden">
-    🏆 High Score: <span id="highScoreValue">0</span> (<span id="highScoreName">Unknown</span>)
-  </div>
-
   <!-- Start Screen -->
-  <div id="startScreen" class="start-screen">
+  <div id="startScreen" class="screen">
     <h2>Phishing Detection Challenge</h2>
-    <p>Test your skills at identifying phishing emails!</p>
+    <p style="font-size: 1.1em; margin: 20px 0;">Test your cybersecurity skills! Can you identify phishing emails?</p>
+    
     <div class="difficulty-buttons">
-      <button class="btn-difficulty btn-easy" data-difficulty="easy">
-        <span>🟢 Easy</span>
+      <button class="btn-success" data-difficulty="easy">
+        🟢 Easy
       </button>
       <div class="difficulty-info">30 seconds per email • Basic phishing attempts</div>
       
-      <button class="btn-difficulty btn-medium" data-difficulty="medium">
-        <span>🟡 Medium</span>
+      <button class="btn-warning" data-difficulty="medium">
+        🟡 Medium
       </button>
       <div class="difficulty-info">20 seconds per email • Moderate difficulty</div>
       
-      <button class="btn-difficulty btn-hard" data-difficulty="hard">
-        <span>🔴 Hard</span>
+      <button class="btn-danger" data-difficulty="hard">
+        🔴 Hard
       </button>
       <div class="difficulty-info">10 seconds per email • Expert level challenges</div>
+    </div>
+
+    <div class="menu-buttons">
+      <button class="btn-primary" id="viewLeaderboardBtn">🏆 Leaderboard</button>
+      <button class="btn-primary" id="viewAnalyticsBtn">📊 Analytics</button>
     </div>
   </div>
 
   <!-- Game Screen -->
-  <div id="gameScreen" class="hidden">
+  <div id="gameScreen" class="screen hidden">
     <div class="game-info">
       <div class="score">Score: <span id="scoreValue">0</span></div>
       <div class="difficulty-label">Level: <span id="difficultyDisplay">Easy</span></div>
@@ -605,90 +601,132 @@ button:disabled {
     </div>
 
     <div class="buttons">
-      <button class="btn-legit" id="btnLegit">✅ Legit</button>
-      <button class="btn-phishing" id="btnPhishing">❌ Phishing</button>
+      <button class="btn-success" id="btnLegit">✅ Legit</button>
+      <button class="btn-danger" id="btnPhishing">❌ Phishing</button>
     </div>
 
     <div class="feedback" id="feedback"></div>
-
     <div id="explanationPanel" class="hidden"></div>
   </div>
 
   <!-- Game Over Screen -->
-  <div id="gameOverScreen" class="game-over hidden">
+  <div id="gameOverScreen" class="screen hidden" style="text-align: center;">
     <h2>🎯 Game Over!</h2>
     <div class="final-score">Final Score: <span id="finalScore">0</span></div>
     <div class="rank-message" id="rankMessage"></div>
+    <div id="difficultyBadge"></div>
     
-    <!-- New High Score Section -->
-    <div id="newHighScoreSection" class="new-high-score hidden">
-      <h3>🎊 New High Score! 🎊</h3>
-      <p>Enter your name to save your score:</p>
-      <input type="text" id="nameInput" class="name-input" placeholder="Your Name" maxlength="20">
+    <div style="margin: 30px 0;">
+      <input type="text" id="nameInput" class="name-input" placeholder="Enter your name" maxlength="20">
       <br>
-      <button class="btn-save-score" id="btnSaveScore">Save Score</button>
+      <button class="btn-gold" id="btnSaveScore" style="margin-top: 15px;">💾 Save Score</button>
     </div>
     
-    <button class="btn-restart" id="btnRestart">🔄 Play Again</button>
+    <div class="menu-buttons">
+      <button class="btn-primary" id="btnRestart">🔄 Play Again</button>
+      <button class="btn-primary" id="btnViewLeaderboard">🏆 Leaderboard</button>
+      <button class="btn-primary" id="btnViewAnalytics">📊 Analytics</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Screen -->
+  <div id="leaderboardScreen" class="screen hidden">
+    <h2 style="color: var(--accent-gold); margin-bottom: 20px;">🏆 Leaderboard</h2>
+    <table class="leaderboard-table" id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Score</th>
+          <th>Difficulty</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
+    <button class="btn-primary" id="backFromLeaderboard" style="margin-top: 20px;">← Back to Menu</button>
+  </div>
+
+  <!-- Analytics Screen -->
+  <div id="analyticsScreen" class="screen hidden">
+    <h2 style="color: var(--accent-primary); margin-bottom: 20px;">📊 Performance Analytics</h2>
+    <div class="analytics-grid">
+      <div class="stat-card">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="accuracyStat">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Time</div>
+        <div class="stat-value" id="avgTimeStat">0s</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Played</div>
+        <div class="stat-value" id="totalPlayedStat">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Best Streak</div>
+        <div class="stat-value" id="bestStreakStat">0</div>
+      </div>
+    </div>
+    <button class="btn-primary" id="backFromAnalytics" style="margin-top: 20px;">← Back to Menu</button>
   </div>
 </div>
 
 <script>
 // ============================================
-// EMAIL DATABASE WITH DIFFICULTY LEVELS
+// EMAIL DATABASE
 // ============================================
 const emails = [
   // EASY EMAILS
   {
     subject: "You've won $1,000,000!!!",
     from: "winner@lottery-claim-center.net",
-    body: "CONGRATULATIONS! You have been randomly selected as the winner of our international lottery! To claim your prize of $1,000,000, please provide your bank account details, social security number, and a processing fee of $500. Act now before this offer expires!",
+    body: "CONGRATULATIONS! You have been randomly selected as the winner of our international lottery! To claim your prize of $1,000,000, please provide your bank account details, social security number, and a processing fee of $500. {link:Click here to claim|http://scam-site-evil.com/steal-data} Act now before this offer expires!",
     isPhishing: true,
     difficulty: "easy",
     explanation: [
       "Too good to be true - unsolicited lottery winnings",
-      "Requests sensitive personal information (SSN, bank details)",
-      "Asks for money upfront to claim a 'prize'",
-      "Excessive use of caps and exclamation marks"
+      "Requests sensitive personal information",
+      "Asks for money upfront to claim a prize",
+      "Link text doesn't match actual URL"
     ]
   },
   {
-    subject: "Team Meeting Reminder - Tomorrow 10 AM",
+    subject: "Team Meeting Reminder",
     from: "hr@company.com",
-    body: "Hi team, This is a reminder that we have our weekly team meeting scheduled for tomorrow at 10:00 AM in Conference Room B. Please review the agenda attached and come prepared with your project updates. See you there!",
+    body: "Hi team, This is a reminder that we have our weekly team meeting scheduled for tomorrow at 10:00 AM in Conference Room B. Please review the agenda and come prepared with your project updates.",
     isPhishing: false,
     difficulty: "easy",
     explanation: [
       "Comes from legitimate company domain",
-      "Professional and friendly tone without urgency",
-      "No suspicious links or requests for sensitive information",
-      "Specific details like meeting time and location"
+      "Professional tone without urgency",
+      "No suspicious links or requests",
+      "Specific meeting details provided"
     ]
   },
   {
-    subject: "Your package could not be delivered",
+    subject: "Your package delivery failed",
     from: "delivery@fedx-express.com",
-    body: "We attempted to deliver your package but no one was available. To reschedule delivery, please confirm your address and pay a $3.99 redelivery fee by clicking the link below. Your package will be returned if not claimed within 48 hours.",
+    body: "We attempted to deliver your package but no one was available. To reschedule delivery, {link:click this link|http://fake-fedex-scam.ru/login} and pay a $3.99 redelivery fee. Your package will be returned if not claimed within 48 hours.",
     isPhishing: true,
     difficulty: "easy",
     explanation: [
       "Misspelled domain 'fedx' instead of 'fedex'",
-      "Unexpected delivery fee for a package you didn't order",
-      "Creates urgency with 48-hour deadline",
-      "Legitimate carriers don't ask for payment via email links"
+      "Unexpected delivery fee",
+      "Creates false urgency",
+      "Suspicious link domain (.ru)"
     ]
   },
   {
     subject: "Monthly Newsletter - April 2024",
     from: "newsletter@techcompany.com",
-    body: "Welcome to our April newsletter! This month we're featuring new product updates, upcoming webinars, and industry insights. Check out our latest blog post about cybersecurity best practices. You can unsubscribe anytime from your account settings.",
+    body: "Welcome to our April newsletter! This month we're featuring new product updates, upcoming webinars, and industry insights. You can unsubscribe anytime from your account settings.",
     isPhishing: false,
     difficulty: "easy",
     explanation: [
-      "Legitimate company newsletter from official domain",
-      "No urgent calls to action or threats",
-      "Provides unsubscribe option (required by law)",
-      "Informational content without requesting personal data"
+      "Legitimate company newsletter",
+      "No urgent calls to action",
+      "Provides unsubscribe option",
+      "No requests for personal data"
     ]
   },
 
@@ -696,113 +734,113 @@ const emails = [
   {
     subject: "Urgent! Verify your bank account",
     from: "support@secure-bank-login.com",
-    body: "Dear customer, Your account has been temporarily suspended due to suspicious activity. Click here immediately to verify your identity and restore access. Failure to do so within 24 hours will result in permanent account closure.",
+    body: "Dear customer, Your account has been temporarily suspended due to suspicious activity. {link:Click here immediately|http://bank-phishing-site.tk/verify} to verify your identity and restore access. Failure to do so within 24 hours will result in permanent account closure.",
     isPhishing: true,
     difficulty: "medium",
     explanation: [
-      "Suspicious domain 'secure-bank-login.com' - not an official bank domain",
-      "Creates urgency and fear to pressure you into acting quickly",
-      "Generic greeting 'Dear customer' instead of using your name",
-      "Threatens account closure to manipulate you"
+      "Suspicious domain - not official bank",
+      "Creates urgency and fear",
+      "Generic greeting 'Dear customer'",
+      "Link leads to suspicious .tk domain"
     ]
   },
   {
     subject: "Invoice #45821 - Payment Confirmation",
     from: "accounts@vendor.com",
-    body: "Thank you for your recent purchase. Your payment of $299.00 has been processed successfully. Please find attached your invoice for order #45821. If you have any questions, contact our support team at support@vendor.com.",
+    body: "Thank you for your recent purchase. Your payment of $299.00 has been processed successfully. Please find attached your invoice for order #45821. Contact our support team at support@vendor.com with questions.",
     isPhishing: false,
     difficulty: "medium",
     explanation: [
       "Professional business communication",
-      "Provides specific order and invoice numbers",
-      "Legitimate support contact information",
-      "No urgent demands or suspicious requests"
+      "Specific order and invoice numbers",
+      "Legitimate support contact",
+      "No suspicious requests"
     ]
   },
   {
-    subject: "ACTION REQUIRED: Update Payment Information",
+    subject: "ACTION REQUIRED: Update Payment Info",
     from: "billing@paypa1-secure.com",
-    body: "We noticed an issue with your payment method. Your PayPal account will be limited unless you update your information immediately. Click the link below to verify your credit card details and avoid service interruption.",
+    body: "We noticed an issue with your payment method. Your PayPal account will be limited unless you {link:update your information|http://paypal-phish.com/account} immediately. Click the link below to verify your credit card details.",
     isPhishing: true,
     difficulty: "medium",
     explanation: [
-      "Domain uses number '1' instead of letter 'l' in PayPal - classic phishing trick",
-      "Creates false urgency about account limitation",
-      "Requests sensitive payment information",
-      "Real PayPal would never ask for this via email"
+      "Domain uses '1' instead of 'l' in PayPal",
+      "Creates false urgency",
+      "Requests sensitive payment info",
+      "Link doesn't go to paypal.com"
     ]
   },
   {
     subject: "Weekly Report - Q1 Results",
     from: "analytics@company.com",
-    body: "Hello, Please find attached the weekly analytics report for Q1. Our team has seen a 15% increase in user engagement this quarter. The detailed breakdown is available in the attached PDF. Let me know if you need any clarification.",
+    body: "Hello, Please find attached the weekly analytics report for Q1. Our team has seen a 15% increase in user engagement this quarter. The detailed breakdown is available in the attached PDF.",
     isPhishing: false,
     difficulty: "medium",
     explanation: [
-      "Internal company communication from verified domain",
+      "Internal company communication",
       "Professional business language",
-      "Specific data and metrics included",
-      "No suspicious links or requests for personal information"
+      "Specific data and metrics",
+      "No suspicious links or requests"
     ]
   },
 
   // HARD EMAILS
   {
-    subject: "Security Alert: New login from unknown device",
+    subject: "Security Alert: New login detected",
     from: "no-reply@app1e-security.com",
-    body: "We detected a login to your Apple ID from a device we don't recognize. If this wasn't you, your account may be compromised. Click here to secure your account immediately and change your password. Location: Russia. Device: Windows PC.",
+    body: "We detected a login to your Apple ID from a device we don't recognize. If this wasn't you, your account may be compromised. {link:Click here to secure your account|http://apple-security-check.xyz/verify} immediately. Location: Russia. Device: Windows PC.",
     isPhishing: true,
     difficulty: "hard",
     explanation: [
-      "Domain uses number '1' instead of letter 'l' in Apple - subtle trick",
+      "Domain uses '1' instead of 'l' - subtle trick",
       "Fake security alert to create panic",
-      "Suspicious login location designed to scare you",
-      "Real Apple security alerts come through official app notifications"
+      "Suspicious login location to scare user",
+      "Link goes to .xyz domain, not apple.com"
     ]
   },
   {
     subject: "Your subscription renewal confirmation",
     from: "subscriptions@streamingservice.com",
-    body: "Hi there! Your monthly subscription has been successfully renewed for $12.99. Your next billing date is May 15, 2024. You can manage your subscription settings anytime from your account dashboard. Thanks for being a valued member!",
+    body: "Hi there! Your monthly subscription has been successfully renewed for $12.99. Your next billing date is May 15, 2024. You can manage your subscription settings anytime from your account dashboard.",
     isPhishing: false,
     difficulty: "hard",
     explanation: [
       "Legitimate subscription confirmation",
-      "Specific pricing and billing date information",
-      "No requests for payment or personal information",
-      "Directs to account dashboard for changes (not external link)"
+      "Specific pricing and billing date",
+      "No requests for payment info",
+      "Directs to account dashboard"
     ]
   },
   {
     subject: "RE: Document Review Required",
     from: "cfo@companylnc.com",
-    body: "Hi, I need you to review this contract before our meeting at 3pm today. It's urgent and confidential. I'm in meetings all day so can't call. Please download the document from this secure link and send your approval ASAP. Thanks!",
+    body: "Hi, I need you to review this contract before our meeting at 3pm today. It's urgent and confidential. I'm in meetings all day so can't call. Please {link:download the document|http://malicious-docs.com/contract.exe} from this secure link and send your approval ASAP.",
     isPhishing: true,
     difficulty: "hard",
     explanation: [
-      "Domain uses 'lnc' instead of 'Inc' - very subtle typo",
+      "Domain uses 'lnc' instead of 'Inc' - subtle typo",
       "Creates urgency and time pressure",
-      "Claims sender is unavailable to verify (red flag)",
-      "Requests immediate action on 'confidential' document"
+      "Claims sender unavailable to verify",
+      "Link goes to .exe file - major red flag"
     ]
   },
   {
     subject: "Expense Report Approved - March 2024",
     from: "finance@company.com",
-    body: "Your expense report for March 2024 has been approved. Total reimbursement: $847.32. The amount will be deposited to your account within 3-5 business days. View detailed breakdown in the finance portal. Contact finance@company.com with questions.",
+    body: "Your expense report for March 2024 has been approved. Total reimbursement: $847.32. The amount will be deposited to your account within 3-5 business days. View detailed breakdown in the finance portal.",
     isPhishing: false,
     difficulty: "hard",
     explanation: [
       "Legitimate internal company email",
       "Specific dollar amount and timeframe",
-      "Directs to company portal (not external link)",
-      "Provides legitimate contact information"
+      "Directs to company portal",
+      "Provides legitimate contact info"
     ]
   }
 ];
 
 // ============================================
-// GAME STATE VARIABLES
+// GAME STATE
 // ============================================
 let currentScore = 0;
 let currentEmailIndex = 0;
@@ -812,14 +850,26 @@ let timerInterval;
 let buttonsEnabled = true;
 let selectedDifficulty = 'easy';
 let timerDuration = 30;
+let recentAnswers = []; // Track last 3 answers for adaptive difficulty
+let sessionStats = {
+  correctAnswers: 0,
+  wrongAnswers: 0,
+  totalTime: 0,
+  questionsAnswered: 0,
+  currentStreak: 0,
+  bestStreak: 0
+};
 
 // ============================================
 // DOM ELEMENTS
 // ============================================
-const highScoreDisplay = document.getElementById('highScoreDisplay');
-const highScoreValue = document.getElementById('highScoreValue');
-const highScoreName = document.getElementById('highScoreName');
+const darkModeToggle = document.getElementById('darkModeToggle');
 const startScreen = document.getElementById('startScreen');
+const gameScreen = document.getElementById('gameScreen');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const leaderboardScreen = document.getElementById('leaderboardScreen');
+const analyticsScreen = document.getElementById('analyticsScreen');
+
 const scoreValue = document.getElementById('scoreValue');
 const emailProgress = document.getElementById('emailProgress');
 const timeValue = document.getElementById('timeValue');
@@ -832,207 +882,346 @@ const emailCard = document.getElementById('emailCard');
 const feedback = document.getElementById('feedback');
 const btnLegit = document.getElementById('btnLegit');
 const btnPhishing = document.getElementById('btnPhishing');
-const gameScreen = document.getElementById('gameScreen');
-const gameOverScreen = document.getElementById('gameOverScreen');
+const explanationPanel = document.getElementById('explanationPanel');
 const finalScore = document.getElementById('finalScore');
 const rankMessage = document.getElementById('rankMessage');
-const btnRestart = document.getElementById('btnRestart');
-const explanationPanel = document.getElementById('explanationPanel');
-const newHighScoreSection = document.getElementById('newHighScoreSection');
+const difficultyBadge = document.getElementById('difficultyBadge');
 const nameInput = document.getElementById('nameInput');
 const btnSaveScore = document.getElementById('btnSaveScore');
 
 // ============================================
-// HIGH SCORE MANAGEMENT
+// SOUND EFFECTS
 // ============================================
-
-/**
- * Load high score from localStorage
- * Returns the saved score data or null if none exists
- */
-function loadHighScore() {
-  const savedScore = localStorage.getItem('phishingGameHighScore');
-  if (savedScore) {
-    const scoreData = JSON.parse(savedScore);
-    highScoreValue.textContent = scoreData.score;
-    highScoreName.textContent = scoreData.name;
-    highScoreDisplay.classList.remove('hidden');
-    return scoreData;
+function playSound(isCorrect) {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  if (isCorrect) {
+    // Happy sound
+    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+  } else {
+    // Error sound
+    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(150, audioContext.currentTime + 0.1);
   }
-  return null;
-}
-
-/**
- * Save high score to localStorage
- * Only saves if score is higher than existing high score
- */
-function saveHighScore(name, score) {
-  const scoreData = {
-    name: name || 'Anonymous',
-    score: score
-  };
-  localStorage.setItem('phishingGameHighScore', JSON.stringify(scoreData));
-  highScoreValue.textContent = score;
-  highScoreName.textContent = scoreData.name;
-  highScoreDisplay.classList.remove('hidden');
-}
-
-/**
- * Check if current score beats the high score
- */
-function isNewHighScore(score) {
-  const currentHighScore = loadHighScore();
-  return !currentHighScore || score > currentHighScore.score;
+  
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 0.3);
 }
 
 // ============================================
-// DIFFICULTY SELECTION
+// DARK MODE
 // ============================================
+function initDarkMode() {
+  const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'enabled') {
+    document.body.classList.add('dark-mode');
+    darkModeToggle.textContent = '☀️ Light Mode';
+  }
+}
 
-/**
- * Handle difficulty button clicks
- * Set timer duration based on difficulty and start game
- */
-document.querySelectorAll('.btn-difficulty').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    selectedDifficulty = e.currentTarget.dataset.difficulty;
-    
-    // Set timer duration based on difficulty
-    switch(selectedDifficulty) {
-      case 'easy':
-        timerDuration = 30;
-        break;
-      case 'medium':
-        timerDuration = 20;
-        break;
-      case 'hard':
-        timerDuration = 10;
-        break;
-    }
-    
-    // Update difficulty display
-    difficultyDisplay.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
-    
-    // Start game
-    startGame();
-  });
+darkModeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+  darkModeToggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
 });
 
 // ============================================
-// GAME FUNCTIONS
+// LEADERBOARD MANAGEMENT
 // ============================================
-
-/**
- * Filter and shuffle emails based on selected difficulty
- */
-function prepareEmails() {
-  // Filter emails by selected difficulty
-  const emailsByDifficulty = emails.filter(email => email.difficulty === selectedDifficulty);
+function saveToLeaderboard(name, score, difficulty) {
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  leaderboard.push({
+    name: name || 'Anonymous',
+    score: score,
+    difficulty: difficulty,
+    date: new Date().toISOString()
+  });
   
-  // Shuffle the filtered emails
+  // Sort by score descending and keep top 10
+  leaderboard.sort((a, b) => b.score - a.score);
+  leaderboard = leaderboard.slice(0, 10);
+  
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+}
+
+function displayLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+  const tbody = document.getElementById('leaderboardBody');
+  tbody.innerHTML = '';
+  
+  if (leaderboard.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px;">No scores yet. Be the first!</td></tr>';
+    return;
+  }
+  
+  leaderboard.forEach((entry, index) => {
+    const row = document.createElement('tr');
+    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+    const badgeClass = entry.difficulty === 'easy' ? 'badge-easy' : entry.difficulty === 'medium' ? 'badge-medium' : 'badge-hard';
+    
+    row.innerHTML = `
+      <td><span class="rank-medal">${medal}</span>${index + 1}</td>
+      <td>${entry.name}</td>
+      <td><strong>${entry.score}</strong></td>
+      <td><span class="difficulty-badge ${badgeClass}">${entry.difficulty}</span></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// ============================================
+// ANALYTICS MANAGEMENT
+// ============================================
+function saveAnalytics() {
+  const analytics = JSON.parse(localStorage.getItem('analytics') || '{"totalCorrect": 0, "totalWrong": 0, "totalTime": 0, "totalQuestions": 0, "bestStreak": 0}');
+  
+  analytics.totalCorrect += sessionStats.correctAnswers;
+  analytics.totalWrong += sessionStats.wrongAnswers;
+  analytics.totalTime += sessionStats.totalTime;
+  analytics.totalQuestions += sessionStats.questionsAnswered;
+  analytics.bestStreak = Math.max(analytics.bestStreak, sessionStats.bestStreak);
+  
+  localStorage.setItem('analytics', JSON.stringify(analytics));
+}
+
+function displayAnalytics() {
+  const analytics = JSON.parse(localStorage.getItem('analytics') || '{"totalCorrect": 0, "totalWrong": 0, "totalTime": 0, "totalQuestions": 0, "bestStreak": 0}');
+  
+  const total = analytics.totalQuestions || 1;
+  const accuracy = ((analytics.totalCorrect / total) * 100).toFixed(1);
+  const avgTime = (analytics.totalTime / total).toFixed(1);
+  
+  document.getElementById('accuracyStat').textContent = accuracy + '%';
+  document.getElementById('avgTimeStat').textContent = avgTime + 's';
+  document.getElementById('totalPlayedStat').textContent = analytics.totalQuestions;
+  document.getElementById('bestStreakStat').textContent = analytics.bestStreak;
+}
+
+// ============================================
+// ADAPTIVE DIFFICULTY
+// ============================================
+function adjustDifficulty(isCorrect) {
+  recentAnswers.push(isCorrect);
+  if (recentAnswers.length > 3) {
+    recentAnswers.shift();
+  }
+  
+  if (recentAnswers.length === 3) {
+    const correctCount = recentAnswers.filter(a => a).length;
+    
+    // 3 correct in a row -> increase difficulty
+    if (correctCount === 3 && selectedDifficulty !== 'hard') {
+      const oldDifficulty = selectedDifficulty;
+      selectedDifficulty = selectedDifficulty === 'easy' ? 'medium' : 'hard';
+      timerDuration = selectedDifficulty === 'medium' ? 20 : 10;
+      difficultyDisplay.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+      
+      // Show notification
+      showNotification(`🔥 Level increased to ${selectedDifficulty}!`, 'success');
+      recentAnswers = [];
+    }
+    // 2+ wrong in last 3 -> decrease difficulty
+    else if (correctCount <= 1 && selectedDifficulty !== 'easy') {
+      const oldDifficulty = selectedDifficulty;
+      selectedDifficulty = selectedDifficulty === 'hard' ? 'medium' : 'easy';
+      timerDuration = selectedDifficulty === 'easy' ? 30 : 20;
+      difficultyDisplay.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+      
+      // Show notification
+      showNotification(`Level adjusted to ${selectedDifficulty}`, 'warning');
+      recentAnswers = [];
+    }
+  }
+}
+
+function showNotification(message, type) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: ${type === 'success' ? 'var(--accent-success)' : 'var(--accent-warning)'};
+    color: #000;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+  `;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'fadeOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 2000);
+}
+
+// ============================================
+// FAKE LINK DETECTION
+// ============================================
+function processEmailBody(bodyText) {
+  // Replace {link:text|url} with HTML links
+  return bodyText.replace(/\{link:(.*?)\|(.*?)\}/g, (match, text, url) => {
+    const isSuspicious = !url.toLowerCase().includes(text.toLowerCase().replace(/\s/g, ''));
+    const linkClass = isSuspicious ? 'email-link suspicious' : 'email-link';
+    return `<a href="${url}" class="${linkClass}" data-url="${url}" onclick="return false;">${text}</a>`;
+  });
+}
+
+function initLinkHoverDetection() {
+  emailBody.addEventListener('mouseover', (e) => {
+    if (e.target.classList.contains('email-link')) {
+      const url = e.target.dataset.url;
+      const text = e.target.textContent;
+      
+      // Check if link is suspicious
+      if (e.target.classList.contains('suspicious')) {
+        showLinkTooltip(e.target, url, true);
+      } else {
+        showLinkTooltip(e.target, url, false);
+      }
+    }
+  });
+  
+  emailBody.addEventListener('mouseout', (e) => {
+    if (e.target.classList.contains('email-link')) {
+      hideLinkTooltip();
+    }
+  });
+}
+
+function showLinkTooltip(element, url, isSuspicious) {
+  hideLinkTooltip();
+  
+  const tooltip = document.createElement('div');
+  tooltip.className = 'link-tooltip show';
+  tooltip.id = 'linkTooltip';
+  
+  if (isSuspicious) {
+    tooltip.innerHTML = `⚠️ <strong>Warning!</strong> This link goes to:<br><code>${url}</code>`;
+    tooltip.style.background = 'rgba(255, 68, 68, 0.95)';
+  } else {
+    tooltip.innerHTML = `ℹ️ Link destination:<br><code>${url}</code>`;
+  }
+  
+  element.appendChild(tooltip);
+}
+
+function hideLinkTooltip() {
+  const existing = document.getElementById('linkTooltip');
+  if (existing) existing.remove();
+}
+
+// ============================================
+// GAME LOGIC
+// ============================================
+function prepareEmails() {
+  const emailsByDifficulty = emails.filter(email => email.difficulty === selectedDifficulty);
   filteredEmails = [...emailsByDifficulty];
+  
+  // Shuffle
   for (let i = filteredEmails.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [filteredEmails[i], filteredEmails[j]] = [filteredEmails[j], filteredEmails[i]];
   }
 }
 
-/**
- * Initialize and start the game
- */
-function startGame() {
+function startGame(difficulty) {
+  selectedDifficulty = difficulty;
+  timerDuration = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 20 : 10;
+  
   currentScore = 0;
   currentEmailIndex = 0;
+  recentAnswers = [];
+  sessionStats = {
+    correctAnswers: 0,
+    wrongAnswers: 0,
+    totalTime: 0,
+    questionsAnswered: 0,
+    currentStreak: 0,
+    bestStreak: 0
+  };
+  
   prepareEmails();
   updateScore();
+  difficultyDisplay.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   
-  // Hide start screen, show game screen
-  startScreen.classList.add('hidden');
+  hideAllScreens();
   gameScreen.classList.remove('hidden');
-  
   showEmail();
 }
 
-/**
- * Display the current email
- */
 function showEmail() {
   if (currentEmailIndex >= filteredEmails.length) {
     endGame();
     return;
   }
-
+  
   buttonsEnabled = true;
   btnLegit.disabled = false;
   btnPhishing.disabled = false;
   
   const email = filteredEmails[currentEmailIndex];
   
-  // Hide explanation panel
   explanationPanel.classList.add('hidden');
   explanationPanel.innerHTML = '';
   
-  // Fade in animation
-  emailCard.classList.add('fade-out');
-  setTimeout(() => {
-    emailSubject.textContent = email.subject;
-    emailFrom.textContent = email.from;
-    emailBody.textContent = email.body;
-    emailCard.classList.remove('fade-out');
-  }, 150);
-
+  emailSubject.textContent = email.subject;
+  emailFrom.textContent = email.from;
+  emailBody.innerHTML = processEmailBody(email.body);
+  
   feedback.textContent = '';
   updateProgress();
   startTimer();
 }
 
-/**
- * Update score display
- */
 function updateScore() {
   scoreValue.textContent = currentScore;
 }
 
-/**
- * Update email progress display
- */
 function updateProgress() {
   emailProgress.textContent = `${currentEmailIndex + 1}/${filteredEmails.length}`;
 }
 
-/**
- * Start countdown timer
- */
 function startTimer() {
   timeLeft = timerDuration;
   timeValue.textContent = timeLeft;
   timerElement.classList.remove('warning');
+  
+  const startTime = Date.now();
   
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     timeLeft--;
     timeValue.textContent = timeLeft;
     
-    // Show warning when time is low
     if (timeLeft <= 5) {
       timerElement.classList.add('warning');
     }
     
-    // Time's up
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
+      const elapsed = (Date.now() - startTime) / 1000;
+      sessionStats.totalTime += elapsed;
       handleTimeout();
     }
   }, 1000);
 }
 
-/**
- * Display explanation panel after answer
- */
 function showExplanation(isCorrect) {
   const email = filteredEmails[currentEmailIndex];
-  
-  // Create explanation HTML
   const icon = isCorrect ? '✅' : '❌';
   const resultClass = isCorrect ? 'correct' : 'wrong';
   
@@ -1052,27 +1241,22 @@ function showExplanation(isCorrect) {
   
   explanationHTML += `
       </ul>
-      <button class="btn-next" id="btnNext">Next Email →</button>
+      <button class="btn-primary" id="btnNext" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">Next Email →</button>
     </div>
   `;
   
   explanationPanel.innerHTML = explanationHTML;
   explanationPanel.classList.remove('hidden');
   
-  // Add event listener to Next button
   document.getElementById('btnNext').addEventListener('click', () => {
     currentEmailIndex++;
     showEmail();
   });
 }
 
-/**
- * Handle user answer selection
- */
 function handleAnswer(userSaidPhishing) {
   if (!buttonsEnabled) return;
   
-  // Disable buttons and stop timer
   buttonsEnabled = false;
   btnLegit.disabled = true;
   btnPhishing.disabled = true;
@@ -1081,125 +1265,166 @@ function handleAnswer(userSaidPhishing) {
   const email = filteredEmails[currentEmailIndex];
   const isCorrect = userSaidPhishing === email.isPhishing;
   
-  // Update score
+  // Play sound
+  playSound(isCorrect);
+  
+  // Update session stats
+  sessionStats.questionsAnswered++;
+  
   if (isCorrect) {
     currentScore += 10;
+    sessionStats.correctAnswers++;
+    sessionStats.currentStreak++;
+    sessionStats.bestStreak = Math.max(sessionStats.bestStreak, sessionStats.currentStreak);
     feedback.textContent = "Correct! 🎉";
     feedback.className = 'feedback correct';
   } else {
     currentScore -= 5;
+    sessionStats.wrongAnswers++;
+    sessionStats.currentStreak = 0;
     feedback.textContent = "Wrong! ⚠️";
     feedback.className = 'feedback wrong';
   }
   
   updateScore();
+  adjustDifficulty(isCorrect);
   
-  // Show explanation panel after brief delay
   setTimeout(() => {
     showExplanation(isCorrect);
   }, 800);
 }
 
-/**
- * Handle timer timeout
- */
 function handleTimeout() {
   if (!buttonsEnabled) return;
   
-  // Disable buttons
   buttonsEnabled = false;
   btnLegit.disabled = true;
   btnPhishing.disabled = true;
   
-  // Update score (penalty for timeout)
+  sessionStats.questionsAnswered++;
+  sessionStats.wrongAnswers++;
+  sessionStats.currentStreak = 0;
   currentScore -= 5;
+  
+  playSound(false);
+  
   feedback.textContent = "Time's up! ⏰";
   feedback.className = 'feedback wrong';
   updateScore();
   
-  // Show explanation as wrong answer
   setTimeout(() => {
     showExplanation(false);
   }, 800);
 }
 
-/**
- * End game and show results
- */
 function endGame() {
   clearInterval(timerInterval);
-  gameScreen.classList.add('hidden');
+  saveAnalytics();
+  
+  hideAllScreens();
   gameOverScreen.classList.remove('hidden');
   
   finalScore.textContent = currentScore;
   
-  // Determine rank message
   if (currentScore > 70) {
     rankMessage.textContent = "🛡️ Security Expert!";
-    rankMessage.style.color = "#00ff88";
+    rankMessage.style.color = "var(--accent-success)";
   } else {
     rankMessage.textContent = "🔐 Needs Training";
-    rankMessage.style.color = "#ff4444";
+    rankMessage.style.color = "var(--accent-danger)";
   }
   
-  // Check for new high score
-  if (isNewHighScore(currentScore)) {
-    newHighScoreSection.classList.remove('hidden');
-  } else {
-    newHighScoreSection.classList.add('hidden');
-  }
+  const badgeClass = selectedDifficulty === 'easy' ? 'badge-easy' : selectedDifficulty === 'medium' ? 'badge-medium' : 'badge-hard';
+  difficultyBadge.innerHTML = `<span class="difficulty-badge ${badgeClass}">${selectedDifficulty.toUpperCase()}</span>`;
 }
 
-/**
- * Restart game - return to start screen
- */
-function restartGame() {
+function hideAllScreens() {
+  startScreen.classList.add('hidden');
+  gameScreen.classList.add('hidden');
   gameOverScreen.classList.add('hidden');
-  startScreen.classList.remove('hidden');
-  nameInput.value = '';
-}
-
-/**
- * Save high score with player name
- */
-function saveScore() {
-  const playerName = nameInput.value.trim() || 'Anonymous';
-  saveHighScore(playerName, currentScore);
-  newHighScoreSection.classList.add('hidden');
-  
-  // Show success message
-  const successMsg = document.createElement('div');
-  successMsg.textContent = '✅ High score saved!';
-  successMsg.style.color = '#00ff88';
-  successMsg.style.fontSize = '1.2em';
-  successMsg.style.marginTop = '20px';
-  gameOverScreen.insertBefore(successMsg, btnRestart);
-  
-  setTimeout(() => {
-    successMsg.remove();
-  }, 3000);
+  leaderboardScreen.classList.add('hidden');
+  analyticsScreen.classList.add('hidden');
 }
 
 // ============================================
 // EVENT LISTENERS
 // ============================================
-btnLegit.addEventListener('click', () => handleAnswer(false));
-btnPhishing.addEventListener('click', () => handleAnswer(true));
-btnRestart.addEventListener('click', restartGame);
-btnSaveScore.addEventListener('click', saveScore);
 
-// Allow Enter key to save score
-nameInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    saveScore();
+// Difficulty selection
+document.querySelectorAll('.btn-success, .btn-warning, .btn-danger').forEach(btn => {
+  if (btn.dataset.difficulty) {
+    btn.addEventListener('click', (e) => {
+      const difficulty = e.currentTarget.dataset.difficulty;
+      startGame(difficulty);
+    });
   }
 });
 
+// Game buttons
+btnLegit.addEventListener('click', () => handleAnswer(false));
+btnPhishing.addEventListener('click', () => handleAnswer(true));
+
+// Save score
+btnSaveScore.addEventListener('click', () => {
+  const name = nameInput.value.trim() || 'Anonymous';
+  saveToLeaderboard(name, currentScore, selectedDifficulty);
+  
+  btnSaveScore.textContent = '✅ Saved!';
+  btnSaveScore.disabled = true;
+  
+  setTimeout(() => {
+    btnSaveScore.textContent = '💾 Save Score';
+    btnSaveScore.disabled = false;
+  }, 2000);
+});
+
+// Navigation
+document.getElementById('btnRestart').addEventListener('click', () => {
+  hideAllScreens();
+  startScreen.classList.remove('hidden');
+  nameInput.value = '';
+});
+
+document.getElementById('viewLeaderboardBtn').addEventListener('click', () => {
+  displayLeaderboard();
+  hideAllScreens();
+  leaderboardScreen.classList.remove('hidden');
+});
+
+document.getElementById('btnViewLeaderboard').addEventListener('click', () => {
+  displayLeaderboard();
+  hideAllScreens();
+  leaderboardScreen.classList.remove('hidden');
+});
+
+document.getElementById('backFromLeaderboard').addEventListener('click', () => {
+  hideAllScreens();
+  startScreen.classList.remove('hidden');
+});
+
+document.getElementById('viewAnalyticsBtn').addEventListener('click', () => {
+  displayAnalytics();
+  hideAllScreens();
+  analyticsScreen.classList.remove('hidden');
+});
+
+document.getElementById('btnViewAnalytics').addEventListener('click', () => {
+  displayAnalytics();
+  hideAllScreens();
+  analyticsScreen.classList.remove('hidden');
+});
+
+document.getElementById('backFromAnalytics').addEventListener('click', () => {
+  hideAllScreens();
+  startScreen.classList.remove('hidden');
+});
+
 // ============================================
-// INITIALIZE GAME
+// INITIALIZE
 // ============================================
-// Load high score when page loads
-loadHighScore();
+initDarkMode();
+initLinkHoverDetection();
 </script>
+
 </body>
 </html>
