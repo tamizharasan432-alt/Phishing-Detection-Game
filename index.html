@@ -184,6 +184,8 @@ h1 {
   padding: 15px 20px;
   border-radius: 10px;
   backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .score, .timer, .progress, .difficulty-label {
@@ -535,6 +537,20 @@ button:disabled {
 .fade-out {
   opacity: 0;
 }
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2em;
+  }
+  
+  .game-info {
+    font-size: 0.9em;
+  }
+  
+  .buttons {
+    flex-direction: column;
+  }
+}
 </style>
 </head>
 <body>
@@ -544,7 +560,7 @@ button:disabled {
     <p class="subtitle">Can you spot the phishing emails?</p>
   </header>
 
-  <!-- High Score Display (shown on all screens) -->
+  <!-- High Score Display -->
   <div id="highScoreDisplay" class="high-score-display hidden">
     🏆 High Score: <span id="highScoreValue">0</span> (<span id="highScoreName">Unknown</span>)
   </div>
@@ -557,12 +573,12 @@ button:disabled {
       <button class="btn-difficulty btn-easy" data-difficulty="easy">
         <span>🟢 Easy</span>
       </button>
-      <div class="difficulty-info">15 seconds per email • Basic phishing attempts</div>
+      <div class="difficulty-info">30 seconds per email • Basic phishing attempts</div>
       
       <button class="btn-difficulty btn-medium" data-difficulty="medium">
         <span>🟡 Medium</span>
       </button>
-      <div class="difficulty-info">12 seconds per email • Moderate difficulty</div>
+      <div class="difficulty-info">20 seconds per email • Moderate difficulty</div>
       
       <button class="btn-difficulty btn-hard" data-difficulty="hard">
         <span>🔴 Hard</span>
@@ -576,8 +592,8 @@ button:disabled {
     <div class="game-info">
       <div class="score">Score: <span id="scoreValue">0</span></div>
       <div class="difficulty-label">Level: <span id="difficultyDisplay">Easy</span></div>
-      <div class="progress">Email: <span id="emailProgress">1/10</span></div>
-      <div class="timer" id="timer">Time: <span id="timeValue">15</span>s</div>
+      <div class="progress">Email: <span id="emailProgress">1/4</span></div>
+      <div class="timer" id="timer">Time: <span id="timeValue">30</span>s</div>
     </div>
 
     <div class="email-card" id="emailCard">
@@ -791,11 +807,11 @@ const emails = [
 let currentScore = 0;
 let currentEmailIndex = 0;
 let filteredEmails = [];
-let timeLeft = 15;
+let timeLeft = 30;
 let timerInterval;
 let buttonsEnabled = true;
 let selectedDifficulty = 'easy';
-let timerDuration = 15;
+let timerDuration = 30;
 
 // ============================================
 // DOM ELEMENTS
@@ -830,7 +846,10 @@ const btnSaveScore = document.getElementById('btnSaveScore');
 // HIGH SCORE MANAGEMENT
 // ============================================
 
-// Load high score from localStorage
+/**
+ * Load high score from localStorage
+ * Returns the saved score data or null if none exists
+ */
 function loadHighScore() {
   const savedScore = localStorage.getItem('phishingGameHighScore');
   if (savedScore) {
@@ -843,7 +862,10 @@ function loadHighScore() {
   return null;
 }
 
-// Save high score to localStorage
+/**
+ * Save high score to localStorage
+ * Only saves if score is higher than existing high score
+ */
 function saveHighScore(name, score) {
   const scoreData = {
     name: name || 'Anonymous',
@@ -855,7 +877,9 @@ function saveHighScore(name, score) {
   highScoreDisplay.classList.remove('hidden');
 }
 
-// Check if current score is a new high score
+/**
+ * Check if current score beats the high score
+ */
 function isNewHighScore(score) {
   const currentHighScore = loadHighScore();
   return !currentHighScore || score > currentHighScore.score;
@@ -865,7 +889,10 @@ function isNewHighScore(score) {
 // DIFFICULTY SELECTION
 // ============================================
 
-// Handle difficulty selection
+/**
+ * Handle difficulty button clicks
+ * Set timer duration based on difficulty and start game
+ */
 document.querySelectorAll('.btn-difficulty').forEach(btn => {
   btn.addEventListener('click', (e) => {
     selectedDifficulty = e.currentTarget.dataset.difficulty;
@@ -873,10 +900,10 @@ document.querySelectorAll('.btn-difficulty').forEach(btn => {
     // Set timer duration based on difficulty
     switch(selectedDifficulty) {
       case 'easy':
-        timerDuration = 15;
+        timerDuration = 30;
         break;
       case 'medium':
-        timerDuration = 12;
+        timerDuration = 20;
         break;
       case 'hard':
         timerDuration = 10;
@@ -895,7 +922,9 @@ document.querySelectorAll('.btn-difficulty').forEach(btn => {
 // GAME FUNCTIONS
 // ============================================
 
-// Filter and shuffle emails by difficulty
+/**
+ * Filter and shuffle emails based on selected difficulty
+ */
 function prepareEmails() {
   // Filter emails by selected difficulty
   const emailsByDifficulty = emails.filter(email => email.difficulty === selectedDifficulty);
@@ -908,7 +937,9 @@ function prepareEmails() {
   }
 }
 
-// Start the game
+/**
+ * Initialize and start the game
+ */
 function startGame() {
   currentScore = 0;
   currentEmailIndex = 0;
@@ -922,7 +953,9 @@ function startGame() {
   showEmail();
 }
 
-// Display current email
+/**
+ * Display the current email
+ */
 function showEmail() {
   if (currentEmailIndex >= filteredEmails.length) {
     endGame();
@@ -953,17 +986,23 @@ function showEmail() {
   startTimer();
 }
 
-// Update score display
+/**
+ * Update score display
+ */
 function updateScore() {
   scoreValue.textContent = currentScore;
 }
 
-// Update progress display
+/**
+ * Update email progress display
+ */
 function updateProgress() {
   emailProgress.textContent = `${currentEmailIndex + 1}/${filteredEmails.length}`;
 }
 
-// Start countdown timer
+/**
+ * Start countdown timer
+ */
 function startTimer() {
   timeLeft = timerDuration;
   timeValue.textContent = timeLeft;
@@ -974,10 +1013,12 @@ function startTimer() {
     timeLeft--;
     timeValue.textContent = timeLeft;
     
+    // Show warning when time is low
     if (timeLeft <= 5) {
       timerElement.classList.add('warning');
     }
     
+    // Time's up
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       handleTimeout();
@@ -985,7 +1026,9 @@ function startTimer() {
   }, 1000);
 }
 
-// Show explanation panel
+/**
+ * Display explanation panel after answer
+ */
 function showExplanation(isCorrect) {
   const email = filteredEmails[currentEmailIndex];
   
@@ -1023,7 +1066,9 @@ function showExplanation(isCorrect) {
   });
 }
 
-// Handle answer selection
+/**
+ * Handle user answer selection
+ */
 function handleAnswer(userSaidPhishing) {
   if (!buttonsEnabled) return;
   
@@ -1036,7 +1081,7 @@ function handleAnswer(userSaidPhishing) {
   const email = filteredEmails[currentEmailIndex];
   const isCorrect = userSaidPhishing === email.isPhishing;
   
-  // Update score first
+  // Update score
   if (isCorrect) {
     currentScore += 10;
     feedback.textContent = "Correct! 🎉";
@@ -1055,7 +1100,9 @@ function handleAnswer(userSaidPhishing) {
   }, 800);
 }
 
-// Handle timeout
+/**
+ * Handle timer timeout
+ */
 function handleTimeout() {
   if (!buttonsEnabled) return;
   
@@ -1064,7 +1111,7 @@ function handleTimeout() {
   btnLegit.disabled = true;
   btnPhishing.disabled = true;
   
-  // Update score
+  // Update score (penalty for timeout)
   currentScore -= 5;
   feedback.textContent = "Time's up! ⏰";
   feedback.className = 'feedback wrong';
@@ -1076,7 +1123,9 @@ function handleTimeout() {
   }, 800);
 }
 
-// End game and show results
+/**
+ * End game and show results
+ */
 function endGame() {
   clearInterval(timerInterval);
   gameScreen.classList.add('hidden');
@@ -1101,14 +1150,18 @@ function endGame() {
   }
 }
 
-// Restart game
+/**
+ * Restart game - return to start screen
+ */
 function restartGame() {
   gameOverScreen.classList.add('hidden');
   startScreen.classList.remove('hidden');
   nameInput.value = '';
 }
 
-// Save high score with name
+/**
+ * Save high score with player name
+ */
 function saveScore() {
   const playerName = nameInput.value.trim() || 'Anonymous';
   saveHighScore(playerName, currentScore);
@@ -1143,8 +1196,9 @@ nameInput.addEventListener('keypress', (e) => {
 });
 
 // ============================================
-// INITIALIZE
+// INITIALIZE GAME
 // ============================================
+// Load high score when page loads
 loadHighScore();
 </script>
 </body>
